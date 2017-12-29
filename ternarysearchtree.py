@@ -21,6 +21,25 @@ class TernarySearchTree:
                 return (False)
         return (True)
 
+    def prefix_search(self, s):
+        if not self._tst or not s:
+            return (False)
+
+        n = 0
+        while s:
+            node = self._tst[n]
+            ch = node[0]
+            if s[0] < ch:
+                n = node[1]
+            elif s[0] > ch:
+                n = node[2]
+            else:
+                n = node[3]
+                s = s[1:]
+            if n is None and s:
+                return(False)
+        return (True)         
+
     def insert(self, s):
         assert(s)
         s = s + chr(0)
@@ -95,5 +114,11 @@ if __name__ == 'builtins':
         w = list(w)    
         shuffle(w)    
         assert(not tst.search("".join(w)))
-        
-        
+
+    words = permutations("abcdef")
+    print("Test 5 ...")    
+    for w in words:
+        w = list(w)    
+        shuffle(w)    
+        assert(tst.prefix_search("".join(w)))
+ 
