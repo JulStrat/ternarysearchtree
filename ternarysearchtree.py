@@ -5,73 +5,83 @@ class TernarySearchTree:
     def search(self, s):
         if not self._tst or not s:
             return(False)
-        s = s + chr(0)
         n = 0
-        while s:
-            node = self._tst[n]
-            ch = node[0]
-            if s[0] < ch:
-                n = node[1]
-            elif s[0] > ch:
-                n = node[2]
+        while n is not None:
+            char = s[0]
+            splitchar, lt_node, gt_node, eq_node, leaf = self._tst[n:n+5]
+            if char < splitchar:
+                n = lt_node
+            elif char > splitchar:
+                n = gt_node
             else:
-                n = node[3]
                 s = s[1:]
-            if n is None and s:
-                return (False)
-        return (True)
+                if not s:
+                    return(True if leaf else False )
+                n = eq_node
+        return(False)            
 
-    def prefix_search(self, s):
+    def has_prefix(self, s):
         if not self._tst or not s:
-            return (False)
-
+            return(False)
         n = 0
-        while s:
-            node = self._tst[n]
-            ch = node[0]
-            if s[0] < ch:
-                n = node[1]
-            elif s[0] > ch:
-                n = node[2]
+        while n is not None:
+            char = s[0]
+            splitchar, lt_node, gt_node, eq_node, leaf = self._tst[n:n+5]
+            if char < splitchar:
+                n = lt_node
+            elif char > splitchar:
+                n = gt_node
             else:
-                n = node[3]
                 s = s[1:]
-            if n is None and s:
-                return(False)
-        return (True)         
+                if leaf:
+                    return(True)
+                n = eq_node
+        return(False)            
 
     def insert(self, s):
         assert(s)
-        s = s + chr(0)
+
         if not self._tst:
-            self._tst.append([s[0], None, None, None])
+            self._tst.extend((s[0], None, None, None, False))
+            
         n = 0
         while s:
-            node = self._tst[n]
-            ch = node[0]
-   
-            if s[0] < ch:
-                if node[1] is None:
-                    self._tst.append([s[0], None, None, None])
-                    node[1] = len(self._tst) - 1
-                n = node[1]
-            elif s[0] > ch:
-                if node[2] is None:
-                    self._tst.append([s[0], None, None, None])
-                    node[2] = len(self._tst) - 1
-                n = node[2]
+            char = s[0]
+            splitchar, lt_node, gt_node, eq_node, leaf = self._tst[n:n+5]
+            if char < splitchar:
+                if lt_node is None:
+                    self._tst.extend((char, None, None, None, False))
+                    self._tst[n+1] = len(self._tst) - 5
+                    n = len(self._tst) - 5
+                else:                    
+                    n = lt_node                
+            elif char > splitchar:
+                if gt_node is None:
+                    self._tst.extend((char, None, None, None, False))
+                    self._tst[n+2] = len(self._tst) - 5
+                    n = len(self._tst) - 5
+                else:
+                    n = gt_node                                    
             else:
-                if node[3] is None and ord(ch):
-                    self._tst.append([s[1], None, None, None])
-                    node[3] = len(self._tst) - 1
-                n = node[3]
                 s = s[1:]
-
-if __name__ == 'builtins':
+                if not s:
+                    self._tst[n+4] = True
+                    return()
+                if eq_node is None:
+                    self._tst.extend((s[0], None, None, None, False))
+                    self._tst[n+3] = len(self._tst) - 5
+                    n = len(self._tst) - 5
+                else:
+                    n = eq_node                                    
+if __name__ == '__builtin__':
+    import cProfile
+    pr = cProfile.Profile()
+    
     from itertools import permutations
     from random import shuffle
 
     tst = TernarySearchTree()
+    pr.enable()
     words = permutations("aabcdefgh")
     print("Creating dictionary ...")
     c = 0
@@ -80,21 +90,17 @@ if __name__ == 'builtins':
         c += 1
     print("Total " + str(c) + " words")
 
-    words = permutations("aabcdefgh")
-    print("Test for words ...")
     for w in words:
         w = list(w)
         shuffle(w)
         assert(tst.search("".join(w)))
 
-    words = permutations("aabcdefgh")
     print("Test 1 ...")
     for w in words:
         w = list(w)    
         shuffle(w)    
         assert(not tst.search("".join(w)+'b'))
 
-    words = permutations("aabcdefgh")
     print("Test 2 ...")    
     for w in words:
         w = list(w)    
@@ -115,10 +121,32 @@ if __name__ == 'builtins':
         shuffle(w)    
         assert(not tst.search("".join(w)))
 
-    words = permutations("abcdef")
+    words = permutations("aabcdefgb")
     print("Test 5 ...")    
     for w in words:
         w = list(w)    
         shuffle(w)    
-        assert(tst.prefix_search("".join(w)))
- 
+        assert(not tst.search("".join(w)))
+
+    words = permutations("aabcdefgh")
+    print("Test 6 ...")    
+    for w in words:
+        w = list(w)    
+        shuffle(w)    
+        assert(tst.has_prefix("".join(w)))
+
+    print("Test 7 ...")    
+    for w in words:
+        w = list(w)    
+        shuffle(w)    
+        assert(tst.has_prefix("".join(w)+"b"))
+
+    print("Test 8 ...")    
+    for w in words:
+        w = list(w)    
+        shuffle(w)    
+        assert(tst.has_prefix("".join(w)+"bf"))
+
+
+    pr.disable()
+    pr.print_stats(sort="time")
