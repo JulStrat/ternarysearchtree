@@ -8,26 +8,27 @@ class TreeNode:
         
 class TernarySearchTree:
     def __init__(self):
-        self._tst = []
+        self._root = 0
     
     def search(self, s):
-        if not self._tst or not s:
-            return(False)
-        n = 0
-        while n is not None:
+        if not s:
+            return False
+        n = self._root
+        while n:
             char = s[0]
-            splitchar, lt_node, gt_node, eq_node, leaf = self._tst[n:n+5]
-            if char < splitchar:
-                n = lt_node
-            elif char > splitchar:
-                n = gt_node
+            split_char = n.split_char
+            if char < split_char:
+                n = n.lt_node
+            elif char > split_char:
+                n = n.gt_node
             else:
                 s = s[1:]
                 if not s:
-                    return(True if leaf else False )
-                n = eq_node
-        return(False)            
-
+                    return True if n.leaf else False
+                n = n.eq_node
+        return False
+    
+    '''
     def has_prefix(self, s):
         if not self._tst or not s:
             return(False)
@@ -45,42 +46,34 @@ class TernarySearchTree:
                     return(True)
                 n = eq_node
         return(False)            
-
+    '''
     def insert(self, s):
         assert(s)
 
-        if not self._tst:
-            self._tst.extend((s[0], None, None, None, False))
+        if not self._root:
+            self._root = TreeNode(s[0])
             
-        n = 0
+        n = self._root
         while s:
             char = s[0]
-            splitchar, lt_node, gt_node, eq_node, leaf = self._tst[n:n+5]
-            if char < splitchar:
-                if lt_node is None:
-                    self._tst.extend((char, None, None, None, False))
-                    self._tst[n+1] = len(self._tst) - 5
-                    n = len(self._tst) - 5
-                else:                    
-                    n = lt_node                
-            elif char > splitchar:
-                if gt_node is None:
-                    self._tst.extend((char, None, None, None, False))
-                    self._tst[n+2] = len(self._tst) - 5
-                    n = len(self._tst) - 5
-                else:
-                    n = gt_node                                    
+            split_char = n.split_char
+            if char < split_char:
+                if not n.lt_node:
+                    n.lt_node = TreeNode(char)
+                n = n.lt_node                
+            elif char > split_char:
+                if not n.gt_node:
+                    n.gt_node = TreeNode(char)
+                n = n.gt_node                                    
             else:
                 s = s[1:]
                 if not s:
-                    self._tst[n+4] = True
-                    return()
-                if eq_node is None:
-                    self._tst.extend((s[0], None, None, None, False))
-                    self._tst[n+3] = len(self._tst) - 5
-                    n = len(self._tst) - 5
-                else:
-                    n = eq_node                                    
+                    n.leaf = True
+                    return
+                if not n.eq_node:
+                    n.eq_node = TreeNode(char)
+                n = n.eq_node
+                
 if __name__ == '__builtin__':
     import cProfile
     pr = cProfile.Profile()
