@@ -1,3 +1,11 @@
+class TreeNode:
+    def __init__(self, char):
+        self.split_char = char
+        self.lt_node = 0
+        self.gt_node = 0
+        self.eq_node = 0
+        self.leaf = False
+        
 class TernarySearchTree:
     def __init__(self):
         self._tst = []
