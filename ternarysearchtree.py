@@ -15,11 +15,9 @@ class TernarySearchTree:
             return False
         n = self._root
         while n:
-            char = s[0]
-            split_char = n.split_char
-            if char < split_char:
+            if s[0] < n.split_char:
                 n = n.lt_node
-            elif char > split_char:
+            elif s[0] > n.split_char:
                 n = n.gt_node
             else:
                 s = s[1:]
@@ -28,25 +26,22 @@ class TernarySearchTree:
                 n = n.eq_node
         return False
     
-    '''
     def has_prefix(self, s):
-        if not self._tst or not s:
-            return(False)
-        n = 0
-        while n is not None:
-            char = s[0]
-            splitchar, lt_node, gt_node, eq_node, leaf = self._tst[n:n+5]
-            if char < splitchar:
-                n = lt_node
-            elif char > splitchar:
-                n = gt_node
+        if not s:
+            return False
+        n = self._root
+        while n:
+            if s[0] < n.split_char:
+                n = n.lt_node
+            elif s[0] > n.split_char:
+                n = n.gt_node
             else:
                 s = s[1:]
-                if leaf:
-                    return(True)
-                n = eq_node
-        return(False)            
-    '''
+                if n.leaf:
+                    return True
+                n = n.eq_node
+        return False
+        
     def insert(self, s):
         assert(s)
 
@@ -55,15 +50,15 @@ class TernarySearchTree:
             
         n = self._root
         while s:
-            char = s[0]
-            split_char = n.split_char
-            if char < split_char:
+            #char = s[0]
+
+            if s[0] < n.split_char:
                 if not n.lt_node:
-                    n.lt_node = TreeNode(char)
+                    n.lt_node = TreeNode(s[0])
                 n = n.lt_node                
-            elif char > split_char:
+            elif s[0] > n.split_char:
                 if not n.gt_node:
-                    n.gt_node = TreeNode(char)
+                    n.gt_node = TreeNode(s[0])
                 n = n.gt_node                                    
             else:
                 s = s[1:]
@@ -71,19 +66,21 @@ class TernarySearchTree:
                     n.leaf = True
                     return
                 if not n.eq_node:
-                    n.eq_node = TreeNode(char)
+                    #n.eq_node = TreeNode(char)
+                    n.eq_node = TreeNode(s[0])
                 n = n.eq_node
                 
 if __name__ == '__builtin__':
+    from itertools import permutations
+    from random import shuffle
     import cProfile
     pr = cProfile.Profile()
     
-    from itertools import permutations
-    from random import shuffle
-
     tst = TernarySearchTree()
     pr.enable()
-    words = permutations("aabcdefgh")
+    PATTERN = "aabcdefgh"
+    
+    words = permutations(PATTERN)
     print("Creating dictionary ...")
     c = 0
     for w in words:
@@ -91,63 +88,50 @@ if __name__ == '__builtin__':
         c += 1
     print("Total " + str(c) + " words")
 
+    words = permutations(PATTERN)
+    print("Test words ...")
     for w in words:
-        w = list(w)
-        shuffle(w)
         assert(tst.search("".join(w)))
 
+    words = permutations(PATTERN)
     print("Test 1 ...")
     for w in words:
-        w = list(w)    
-        shuffle(w)    
         assert(not tst.search("".join(w)+'b'))
 
+    words = permutations(PATTERN)    
     print("Test 2 ...")    
     for w in words:
-        w = list(w)    
-        shuffle(w)    
         assert(not tst.search("".join(w)[1:]))
 
     words = permutations("aabcdefgd")
     print("Test 3 ...")    
     for w in words:
-        w = list(w)    
-        shuffle(w)    
         assert(not tst.search("".join(w)))
 
     words = permutations("aabcdefgz")
     print("Test 4 ...")    
     for w in words:
-        w = list(w)    
-        shuffle(w)    
         assert(not tst.search("".join(w)))
 
     words = permutations("aabcdefgb")
     print("Test 5 ...")    
     for w in words:
-        w = list(w)    
-        shuffle(w)    
         assert(not tst.search("".join(w)))
 
-    words = permutations("aabcdefgh")
+    words = permutations(PATTERN)
     print("Test 6 ...")    
     for w in words:
-        w = list(w)    
-        shuffle(w)    
         assert(tst.has_prefix("".join(w)))
-
+    
+    words = permutations(PATTERN)
     print("Test 7 ...")    
     for w in words:
-        w = list(w)    
-        shuffle(w)    
         assert(tst.has_prefix("".join(w)+"b"))
 
+    words = permutations(PATTERN)    
     print("Test 8 ...")    
     for w in words:
-        w = list(w)    
-        shuffle(w)    
         assert(tst.has_prefix("".join(w)+"bf"))
-
 
     pr.disable()
     pr.print_stats(sort="time")
