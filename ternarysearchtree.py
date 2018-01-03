@@ -26,6 +26,9 @@ class TernarySearchTree:
                 n = n.eq_node
         return False
     
+    def __contains__(self, s):
+      return self.search(s)
+    
     def has_prefix(self, s):
         if not s:
             return False
@@ -50,8 +53,6 @@ class TernarySearchTree:
             
         n = self._root
         while s:
-            #char = s[0]
-
             if s[0] < n.split_char:
                 if not n.lt_node:
                     n.lt_node = TreeNode(s[0])
@@ -66,7 +67,6 @@ class TernarySearchTree:
                     n.leaf = True
                     return
                 if not n.eq_node:
-                    #n.eq_node = TreeNode(char)
                     n.eq_node = TreeNode(s[0])
                 n = n.eq_node
                 
@@ -94,9 +94,19 @@ if __name__ == '__builtin__':
         assert(tst.search("".join(w)))
 
     words = permutations(PATTERN)
+    print("Test operator IN ...")
+    for w in words:
+        assert("".join(w) in tst)
+
+    words = permutations(PATTERN)
     print("Test 1 ...")
     for w in words:
         assert(not tst.search("".join(w)+'b'))
+
+    words = permutations(PATTERN)
+    print("Test operator IN ...")
+    for w in words:
+        assert(not "".join(w)+'b' in tst)
 
     words = permutations(PATTERN)    
     print("Test 2 ...")    
