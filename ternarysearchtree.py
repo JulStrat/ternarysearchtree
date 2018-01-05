@@ -30,10 +30,10 @@ class TernarySearchTree:
       return self.search(s)
     
     def has_prefix(self, s):
-        if not s:
-            return False
+        #if not s:
+        #    return False
         n = self._root
-        while n:
+        while n and s:
             if s[0] < n.split_char:
                 n = n.lt_node
             elif s[0] > n.split_char:
@@ -73,10 +73,12 @@ class TernarySearchTree:
 if __name__ == '__builtin__':
     from itertools import permutations
     from random import shuffle
+    from collections import defaultdict
     import cProfile
     pr = cProfile.Profile()
     
-    tst = TernarySearchTree()
+    multi_tst = defaultdict(TernarySearchTree)
+    #tst = TernarySearchTree()
     pr.enable()
     PATTERN = "aabcdefgh"
     
@@ -84,64 +86,64 @@ if __name__ == '__builtin__':
     print("Creating dictionary ...")
     c = 0
     for w in words:
-        tst.insert("".join(w))
+        multi_tst[w[0]].insert("".join(w))
         c += 1
     print("Total " + str(c) + " words")
 
     words = permutations(PATTERN)
     print("Test words ...")
     for w in words:
-        assert(tst.search("".join(w)))
+        assert(multi_tst[w[0]].search("".join(w)))
 
     words = permutations(PATTERN)
     print("Test operator IN ...")
     for w in words:
-        assert("".join(w) in tst)
+        assert("".join(w) in multi_tst[w[0]])
 
     words = permutations(PATTERN)
     print("Test 1 ...")
     for w in words:
-        assert(not tst.search("".join(w)+'b'))
+        assert(not multi_tst[w[0]].search("".join(w)+'b'))
 
     words = permutations(PATTERN)
     print("Test operator IN ...")
     for w in words:
-        assert(not "".join(w)+'b' in tst)
+        assert(not "".join(w)+'b' in multi_tst[w[0]])
 
     words = permutations(PATTERN)    
     print("Test 2 ...")    
     for w in words:
-        assert(not tst.search("".join(w)[1:]))
+        assert(not multi_tst[w[0]].search("".join(w)[1:]))
 
     words = permutations("aabcdefgd")
     print("Test 3 ...")    
     for w in words:
-        assert(not tst.search("".join(w)))
+        assert(not multi_tst[w[0]].search("".join(w)))
 
     words = permutations("aabcdefgz")
     print("Test 4 ...")    
     for w in words:
-        assert(not tst.search("".join(w)))
+        assert(not multi_tst[w[0]].search("".join(w)))
 
     words = permutations("aabcdefgb")
     print("Test 5 ...")    
     for w in words:
-        assert(not tst.search("".join(w)))
+        assert(not multi_tst[w[0]].search("".join(w)))
 
     words = permutations(PATTERN)
     print("Test 6 ...")    
     for w in words:
-        assert(tst.has_prefix("".join(w)))
+        assert(multi_tst[w[0]].has_prefix("".join(w)))
     
     words = permutations(PATTERN)
     print("Test 7 ...")    
     for w in words:
-        assert(tst.has_prefix("".join(w)+"b"))
+        assert(multi_tst[w[0]].has_prefix("".join(w)+"b"))
 
     words = permutations(PATTERN)    
     print("Test 8 ...")    
     for w in words:
-        assert(tst.has_prefix("".join(w)+"bf"))
+        assert(multi_tst[w[0]].has_prefix("".join(w)+"bf"))
 
     pr.disable()
     pr.print_stats(sort="time")
