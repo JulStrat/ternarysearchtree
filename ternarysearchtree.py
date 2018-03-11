@@ -14,14 +14,16 @@ class TernarySearchTree:
         if not s:
             return False
         n = self._root
+        i = 0
         while n:
-            if s[0] < n.split_char:
+            ch = s[i]
+            if ch < n.split_char:
                 n = n.lt_node
-            elif s[0] > n.split_char:
+            elif ch > n.split_char:
                 n = n.gt_node
             else:
-                s = s[1:]
-                if not s:
+                i += 1
+                if i == len(s):
                     return True if n.leaf else False
                 n = n.eq_node
         return False
@@ -47,29 +49,49 @@ class TernarySearchTree:
         
     def insert(self, s):
         assert(s)
-
+        i = 0   
         if not self._root:
-            self._root = TreeNode(s[0])
+            self._root = TreeNode(s[i])
             
         n = self._root
-        while s:
-            if s[0] < n.split_char:
+        while i < len(s):
+            ch = s[i]
+            if ch < n.split_char:
                 if not n.lt_node:
-                    n.lt_node = TreeNode(s[0])
+                    n.lt_node = TreeNode(ch)
                 n = n.lt_node                
-            elif s[0] > n.split_char:
+            elif ch > n.split_char:
                 if not n.gt_node:
-                    n.gt_node = TreeNode(s[0])
+                    n.gt_node = TreeNode(ch)
                 n = n.gt_node                                    
             else:
-                s = s[1:]
-                if not s:
+                i += 1
+                if i == len(s):
                     n.leaf = True
                     return
                 if not n.eq_node:
-                    n.eq_node = TreeNode(s[0])
+                    n.eq_node = TreeNode(s[i])
                 n = n.eq_node
-                
+
+   def prefixes(self, s):
+        #if not s:
+        #    return False
+        p = []
+        n = self._root
+        i = 0
+        while n and i < len(s):
+            if s[i] < n.split_char:
+                n = n.lt_node
+            elif s[i] > n.split_char:
+                n = n.gt_node
+            else:
+                i += 1
+                if n.leaf:
+                    p.append(i)
+                n = n.eq_node
+        return p
+
+
 if __name__ == '__builtin__':
     from itertools import permutations
     from random import shuffle
